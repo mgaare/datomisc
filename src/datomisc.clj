@@ -38,6 +38,11 @@
   [x]
   (instance? datomic.query.EntityMap x))
 
+(defn attribute?
+  "Return true is x is a datomic.Attribute"
+  [x]
+  (instance? datomic.Attribute x))
+
 (defn entity-or-map?
   "Return true if x is an entity or map."
   [x]
