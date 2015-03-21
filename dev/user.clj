@@ -16,19 +16,3 @@
 ; ensure schema
 ; entity? predicate
 ; add :db/add
-
-(defn to-entity-maps
-  "Takes a collection of statements, and returns collection of entity maps."
-  [xs]
-  (->> (reduce
-        (fn [em s]
-          (let [[e a v] ((juxt e a v) s)]
-            (update-in em [e a]
-                       (fn [x]
-                         (if x
-                           (conj x v)
-                           #{v})))))
-        {}
-        xs)
-       (map (fn [[k v]]
-              (assoc v :db/id k)))))
