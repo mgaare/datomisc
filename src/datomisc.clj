@@ -1,5 +1,5 @@
 (ns datomisc
-  (:require [datomic.api :as d]))
+  (:require [datomic.api]))
 
 (defprotocol Statement
   (e [x])
