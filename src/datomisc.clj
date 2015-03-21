@@ -44,32 +44,70 @@
   (or (entity? x)
       (map? x)))
 
+;; Little helper function
+
+(defn to-map
+  "Coerces arg to map."
+  [x]
+  (if (map? x)
+    x
+    (into {} x)))
+
+;; cases:
+;; - receives an entitymap/map
+;; - receives a single kv with entity ref
+;; - receives single kv with value
+;; - receives k with multiple v
+
+;; map
+;;
+;; - check against max-depth, map over kvs with to-statements* and id
+;;   set, add id to processed-ids, increment depth
+
+;; single kv with entity ref
+;; - generate single statement, and then recur with non-id version
+
+;; multiple v
+;; - map across vs, dispatching value vs map
+
 (defn- to-statements*
-  [id kvs]
-  (lazy-seq
-   (when (seq kvs)
-     (let [[k v] (first kvs)]
-       (if (coll? v)
-         (let [ss (if (entity-or-map? v)
-                    (to-statements v)
-                    (map (partial vector id k) v))]
-           (concat ss (rest kvs)))
-         (cons (vector id k v) (to-statements* id (rest kvs))))))))
-
-;; key problem I haven't solved yet: nested entities
-;; - limit recursion depth?
-;; - how to handle cycles? pass around a set of ids that have already been added?
-
+  ([processed-ids max-depth cur-depth m]
+   {:pre [(:db/id m)]}
+   (when (or (not max-depth)
+             (<= cur-depth max-depth))
+     (let [id (:db/id m)]
+       (when-not (contains? @processed-ids id)
+         (swap! processed-ids conj id)
+         (to-statements* processed-ids max-depth (inc cur-depth) id
+                         (-> m to-map (dissoc :db/id)))))))
+  ([processed-ids max-depth cur-depth cur-id xs]
+   (lazy-seq
+    (when (seq xs)
+      (let [[k v] (first xs)
+            nxt (fn [r] (to-statements* processed-ids max-depth cur-depth cur-id r))
+            make-statement (fn [k v]
+                             (if (entity-or-map? v)
+                               (cons [cur-id k (:db/id v)]
+                                     (to-statements* processed-ids max-depth cur-depth v))
+                               [[cur-id k v]]))]
+        (if (set? v)
+          (concat
+           (mapcat (partial make-statement k)
+                   v)
+           (nxt (rest xs)))
+          (concat (make-statement k v) (nxt (rest xs)))))))))
 
 (defn to-statements
   "Takes a Datomic entity or map with :db/id key, and returns lazy seq of
-  [e a v] statements."
-  [m]
-  {:pre [(or (entity? m) (map? m))
-         (:db/id m)]}
-  (let [id (:db/id m)]
-    (->> (dissoc m :db/id)
-         (to-statements* id))))
+   [e a v] statements.
+   Opts is a map with keys:
+    - :max-depth - limits recursion depth (default no limit)"
+  ([m]
+   (to-statements m nil))
+  ([m {:keys [max-depth] :as opts}]
+   {:pre [(entity-or-map? m)
+          (:db/id m)]}
+   (to-statements* (atom #{}) max-depth 0 m)))
 
 (defn to-entity-maps
   "Takes a collection of statements, and returns collection of entity maps."
