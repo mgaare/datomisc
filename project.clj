@@ -1,4 +1,4 @@
-(defproject datomisc "0.1.0"
+(defproject datomisc "0.1.1-SNAPSHOT"
   :description "The Datomic utility functions you're tired having to write."
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
