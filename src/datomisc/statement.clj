@@ -10,6 +10,20 @@
       (and (vector? x)
            (= 2 (count x)))))
 
+(defn remove-command
+  "Given a statement, removes :db/add or :db/remove if present."
+  [stmt]
+  (if (and (sequential? stmt)
+           (#{:db/add :db/remove} (first stmt)))
+    (rest stmt)
+    stmt))
+
+(defn remove-commands
+  "Given a collection of transaction statements, removes :db/add or :db/remove
+  if present."
+  [stmts]
+  (map remove-command stmts))
+
 (defn attribute-exists?
   "Accepts a Datomic db and an attribute keyword, and returns true if the
   attribute is defined in the db."
@@ -27,16 +41,6 @@
         (let [a (first stmt)]
           (or (= :db/id a)
               (attribute-exists? db a)))))
-
-(defn remove-commands
-  "Given a collection of transaction statements, removes :db/add or :db/remove
-  if present."
-  [stmts]
-  (map (fn [s]
-         (if (and (sequential? s)
-                  (#{:db/add :db/remove} (first s)))
-           (rest s)
-           s))))
 
 (defn remove-missing-attributes
   "Accepts a Datomic db and a collection of statements, and removes any
