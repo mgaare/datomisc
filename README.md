@@ -7,11 +7,11 @@ projects that use Datomic.
 
 Leiningen atom:
 
-    [datomisc "0.1.0"]
+    [datomisc "0.1.1"]
 
 If your project uses Datomic pro, then do instead:
 
-    [datomisc "0.1.0" :exclusions [com.datomic/datomic-free]]
+    [datomisc "0.1.1" :exclusions [com.datomic/datomic-free]]
 
 ## Usage
 
