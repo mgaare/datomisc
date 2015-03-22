@@ -36,7 +36,7 @@
   [db stmt]
   {:pre [(or (dm/statement? stmt) (map-entry? stmt))]}
   (cond (dm/statement? stmt)
-        (attribute-exists? db (dm/a stmt))
+        (attribute-exists? db (dm/a (remove-command stmt)))
         :else
         (let [a (first stmt)]
           (or (= :db/id a)
