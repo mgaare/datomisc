@@ -24,6 +24,18 @@
   [stmts]
   (map remove-command stmts))
 
+(defn prepend-command
+  "Takes a command (one of :db/add or :db/remove) and a datomic transaction
+   statement, and returns the statement with the command added."
+  [cmd stmt]
+  (cons cmd stmt))
+
+(defn prepend-commands
+  "Takes a command (one of :db/add or :db/remove) and a collection of datomic
+   transaction statements, and returns the statements with the command added."
+  [cmd stmts]
+  (map (partial prepend-command cmd) stmts))
+
 (defn attribute-exists?
   "Accepts a Datomic db and an attribute keyword, and returns true if the
   attribute is defined in the db."
