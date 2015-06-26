@@ -30,8 +30,8 @@
 
 (def statement?
   "Return true if x is a statement"
-  (every-pred (partial satisfies? Statement)
-              e a v))
+  (apply every-pred (partial satisfies? Statement)
+         (map (partial comp not nil?) [e a v])))
 
 (defn entity?
   "Return true if x is a datomic.query.EntityMap"
