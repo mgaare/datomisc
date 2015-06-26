@@ -49,6 +49,11 @@
   (or (entity? x)
       (map? x)))
 
+(defn db-id?
+  "Return true if x is a Datomic DB ID."
+  [x]
+  (instance? datomic.db.DbId x))
+
 ;; Little helper function
 
 (defn to-map
