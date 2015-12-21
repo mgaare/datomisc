@@ -7,7 +7,7 @@ projects that use Datomic.
 
 Leiningen atom:
 
-    [datomisc "0.1.2"]
+    [datomisc "0.1.3"]
 
 If your project uses Datomic pro, then do instead:
 
