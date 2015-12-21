@@ -4,6 +4,6 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]
                  ;; exclude me if you want to use pro
-                 [com.datomic/datomic-free "0.9.5130"]]
+                 [com.datomic/datomic-free "0.9.5344"]]
   :profiles {:dev {:source-paths ["dev"]
-                   :dependencies [[org.clojure/tools.namespace "0.2.10"]]}})
+                   :dependencies [[org.clojure/tools.namespace "0.2.11"]]}})
