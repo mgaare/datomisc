@@ -1,5 +1,6 @@
 (ns datomisc.test-utils
   (:require [datomic.api :as d]))
+
 (def ^:dynamic *db*)
 
 (def datomic-uri
@@ -65,5 +66,8 @@
 (defn with-test-db
   [f]
   (let [conn (connect)]
+    (d/transact conn test-schema)
+    (d/transact conn test-data)
     (binding [*db* (d/db conn)]
-      (f))))
+      (f))
+    (d/release conn)))

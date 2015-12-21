@@ -1,7 +1,10 @@
 (ns datomisc-test
-  (:require [datomisc :refer :all])
-  (:use clojure.test
-        datomisc.test-utils))
+  (:require [clojure.test :refer :all]
+            [datomisc.test-utils :refer :all]
+            [datomic.api :as d])
+  (:use datomisc))
+
+(use-fixtures :once with-test-db)
 
 (deftest flat-entity-map-test
   (let [in {:db/id 12345
@@ -56,3 +59,22 @@
              [1 :one-ref 2]})
         (set test-output))
     (is (= (count test-output) 2))))
+
+(deftest statement?-test
+  (is (statement? [:e :a :v]))
+  (is (statement? (first (d/datoms *db* :eavt))))
+  (is (not (statement? [:e :a])))
+  (is (not (statement? (d/entity *db* :db.part/db)))))
+
+(deftest attribute?-test
+  (is (attribute? (d/attribute *db* :db/index)))
+  (is (not (attribute? {:db/id 123 :db/ident :db/index}))))
+
+(deftest entity-or-map?-test
+  (is (entity-or-map? {:a 1}))
+  (is (entity-or-map? (d/entity *db* :db.part/db)))
+  (is (not (entity-or-map? [:e :a :v]))))
+
+(deftest db-id?-test
+  (is (db-id? (d/tempid :db.part/user)))
+  (is (not (db-id? {:db/id 123}))))

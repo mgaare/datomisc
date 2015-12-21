@@ -28,10 +28,13 @@
   (t [s]
     (nth s 3 nil)))
 
-(def statement?
-  "Return true if x is a statement"
-  (apply every-pred (partial satisfies? Statement)
-         (map (partial comp not nil?) [e a v])))
+(defn statement?
+  "Return true if x is a Statement."
+  [x]
+  (if (instance? datomic.Datom x)
+    true
+    (and (satisfies? Statement x)
+         ((every-pred e a v) x))))
 
 (defn entity?
   "Return true if x is a datomic.query.EntityMap"
